@@ -7,14 +7,14 @@ o get-ProcessesThatStandOut.ps1
   If the processes would not be running on a fresh image with no user interaction, the process pops up as: Additional Process Running.
 
     
-o SVCHOST should run out of system32, but since it is not, the script alerts the user. Notice, it also displays the parent process.
+    o SVCHOST should run out of system32, but since it is not, the script alerts the user. Notice, it also displays the parent process.
       Process: svchost
       Correct Location: c:\windows\system32\svchost.exe 
       Actual Location: c:\users\badguy\downloads\svchost.exe
       svchost in wrong location!
       Parent Process: bad.exe
     
-o These processes are native to Windows, but since they don't run after a fresh install and a fresh boot with no internet connectivity, they appear in the output of the script.
+    o These processes are native to Windows, but since they don't run after a fresh install and a fresh boot with no internet connectivity, they appear in the output of the script.
 
       Additional Process Running: Windows.WARP.JITService
       Start time: 11/09/2018 16:13:59

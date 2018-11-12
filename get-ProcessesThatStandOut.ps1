@@ -7,12 +7,50 @@
         4. If locations do not match, a notification appears next.
         5. Name of Parent Process
         
+    If the process stands out in any way [basically meaning that the process wouldn't be running on a clean and brand new Windows image],
+    the following will appear
+        1. Addition Process Running: [process]
+        2. Start time
+        3. Any company information about the file.
+        
+        
+        
 .EXAMPLE
+
     Process: svchost
     Correct Location: c:\windows\system32\svchost.exe 
     Actual Location: c:\users\badguy\downloads\svchost.exe
     svchost in wrong location!
     Parent Process: bad.exe
+    
+    Additional Process Running: Windows.WARP.JITService
+    Start time: 11/09/2018 16:13:59
+    No company information given
+
+
+    Additional Process Running: Windows.WARP.JITService
+    Start time: 11/09/2018 16:23:03
+    No company information given
+
+
+    Additional Process Running: Windows.WARP.JITService
+    Start time: 11/09/2018 16:14:08
+    No company information given
+
+
+    Additional Process Running: WinStore.App
+    Start time: 11/09/2018 14:56:56
+    Company: Microsoft Corporation
+
+
+    Additional Process Running: WinStore.App
+    Start time: 11/09/2018 14:56:56
+    Company: Microsoft Corporation
+    
+    
+    Analysts are reminded that all of this information can be faked and/or obfuscated.
+    
+    
 
 .USAGE
     crystalblue.ps1
@@ -21,7 +59,8 @@
 
 #>
 
-
+    #lisa image.txt is a baseline of all running processes after installing Windows.
+    #replace if necessary.
     $locations = gc "lisa image.txt"
     Write-Host "Checking processes..."
     foreach($proc in get-process){

@@ -25,4 +25,4 @@ Also, will look over processes that are not running on a freshly-installed and f
       Start time: 11/09/2018 16:23:03
       No company information given
 
-
+![alt text](https://github.com/TerrySmithMBA/BlueTeamPowershellScripts/blob/master/get-ProcessesThatStandOut/get-processesThatStandOut.PNG)

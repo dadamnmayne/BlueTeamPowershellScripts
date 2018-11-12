@@ -22,7 +22,7 @@
 #>
 
 
-    $locations = gc "C:\Users\abcd\Desktop\lisa image.txt"
+    $locations = gc "lisa image.txt"
     Write-Host "Checking processes..."
     foreach($proc in get-process){
         $name = $proc.Name
@@ -34,26 +34,26 @@
         if (($locations | %{$_ -match $name}) -contains $true) {
 
             foreach ($line in $locations){
-                if ($line -like "$name`#*"){
-           
-                    $correctlocation = $line.split("#")[1]
-                
-                    if ($line.split("#")[1]){
-                    
-                        if ($path -ne $line.split("#")[1]){
-                            Write-Host "$name in wrong location! `n"
-                        }
-                    }
-                    else {
-                    
-                    }
+            if ($line -like "$name`#*"){
 
-                    if ($parentprocess){
-                    
+                $correctlocation = $line.split("#")[1]
+                Write-Host "Process: $name" 
+                if ($line.split("#")[1]){
+                    Write-Host "Correct Location: $correctlocation `nActual Location: $path"
+                    if ($path -ne $line.split("#")[1]){
+                        Write-Host $name in wrong location!
                     }
-                    else {
-                    
-                    }
+                }
+                else {
+                    Write-Host "No path information given"
+                }
+
+                if ($parentprocess){
+                    Write-Host "Parent Process: $parentprocess`n`n`n`n`n"
+                }
+                else {
+                    Write-Host "No Parent Process`n`n`n`n`n"
+                }
                 break
                 }
        

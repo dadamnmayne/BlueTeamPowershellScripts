@@ -16,7 +16,8 @@ Also, will look over processes that are not running on a freshly-installed and f
       svchost in wrong location!
       Parent Process: bad.exe
     
-    o These processes are native to Windows, but since they don't run after a fresh install and a fresh boot with no internet connectivity, they appear in the output of the script.
+    o These processes are native to Windows, but since they don't run after a fresh install 
+    and a fresh boot with no internet connectivity, they appear in the output of the script.
 
       Additional Process Running: Windows.WARP.JITService
       Start time: 11/09/2018 16:13:59

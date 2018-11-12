@@ -1,6 +1,8 @@
     param (
         [string]$computername
     )
+    
+#Runs a lot of commands and saves them to a txt file named after the computer in question.
 
 invoke-command $computername {Get-ChildItem -path C:\Windows\Prefetch | sort-object lastaccesstime | format-table lastaccesstime,name} >> ${computername}report.txt                                                                                                                                   
 invoke-command $computername {netstat -anob} >> ${computername}report.txt                                                            

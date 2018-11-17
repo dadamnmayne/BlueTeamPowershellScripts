@@ -53,7 +53,7 @@
     
 
 .USAGE
-    crystalblue.ps1
+    get-ProcessesThatStandOut.ps1
 
 
 
@@ -114,4 +114,19 @@
         }
         
     }
+    
 
+
+<#
+
+In progress:
+    - script checks names (odd names or processes hiding as valid names)
+    - checks PIDs (order and child-processes)
+    - checks number of sessions
+    - checks CPU usage (eg. unusual process spawning)
+    - checks memory usage (too much for process)
+    - checks handles (too many handles)
+    - checks priority levels (not in the correct hierarchy)
+
+
+#>

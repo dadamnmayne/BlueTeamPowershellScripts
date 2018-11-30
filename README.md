@@ -5,4 +5,4 @@ get-ProcessesThatStandOut.ps1
 
 ![alt text](https://github.com/TerrySmithMBA/BlueTeamPowershellScripts/blob/master/get-ProcessesThatStandOut/get-processesThatStandOut.PNG)
 
-![alt text](https://github.com/TerrySmithMBA/BlueTeamPowershellScripts/blob/master/get-ScheduledTasksThatStandOut/getschtasks.PNG)
+![alt text](https://github.com/TerrySmithMBA/BlueTeamPowershellScripts/blob/master/get-ScheduledTasksThatStandOut/getSchTasks.PNG)

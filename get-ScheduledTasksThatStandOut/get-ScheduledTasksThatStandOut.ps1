@@ -1,4 +1,4 @@
-﻿$lisaTasksAndPaths = gc "C:\Users\abcd\Downloads\BlueTeamPowershellScripts-master (1)\BlueTeamPowershellScripts-master\get-ScheduledTasksThatStandOut\lisa_schtasks.txt"
+﻿$lisaTasksAndPaths = gc "lisa_schtasks.txt"
 
 Write-Host "Checking scheduled tasks..."
 

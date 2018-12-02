@@ -3,6 +3,8 @@ A collection of self-made Powershell Scripts for Cyber Security Host Analysts
 
 
 get-PersistenceItems.ps1
+
+
 This script "knows normal". It scans any box and compares it to the artifacts of a normal box.
 It contains strings saved in variables known as LISAs.
 A LISA is a string of artifacts from a clean Windows image that has never been connected to the internet.

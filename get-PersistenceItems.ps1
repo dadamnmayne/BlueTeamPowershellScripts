@@ -1,4 +1,94 @@
-﻿clear
+﻿$misconfigCount = 0
+clear
+
+
+
+sleep (2)
+
+Write-Host "Checking for persistence items...`n" -Foregroundcolor Green
+
+sleep(2)
+
+if ((get-childitem -force 'HKLM:\software\microsoft\' | ? {$_.property -eq "Autorun"}))  {
+    $misconfigCount++
+    Write-Host "$misconfigCount`. HKLM:\Software\Microsoft contain Autoruns" -ForegroundColor Yellow
+    Write-Host "`n`t" ((gci -force 'HKLM:\SOFTWARE\Microsoft' | out-string) -split "`n" | select-string Autorun | out-string).replace("Autorun            :","").trim() -ForegroundColor Yellow
+    Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+    Write-Host "`t`t- Could be used so that malware can persist." -ForegroundColor Gray
+    Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+    Write-Host "`n`n`n"
+}
+
+sleep(1)
+
+if ((Get-Item 'HKLM:\software\microsoft\windows\CurrentVersion\run').ValueCount -gt 1){
+    $misconfigCount++
+    Write-Host "$misconfigCount`. Additional Keys in Windows\CurrentVersion\Run" -ForegroundColor Yellow
+    $x = ((Get-Item 'HKLM:\software\microsoft\windows\CurrentVersion\run' | out-string) -split "`n").length
+    Write-Host "`n`t" (((Get-Item 'HKLM:\software\microsoft\windows\CurrentVersion\run' | out-string) -split "`n")[8..$x] | out-string).trim() -ForegroundColor Yellow
+    Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+    Write-Host "`t`t- Could be used so that malware can persist." -ForegroundColor Gray
+    Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+    Write-Host "`n`n`n"
+}
+
+sleep(1)
+if ((get-childitem -force 'c:\programdata\microsoft\windows\start menu\programs\startup').count -gt 1){
+    $misconfigCount++
+    Write-Host "$misconfigCount`. Additional Items in C:\ProgramData\Microsoft\Windows\Start Menu\programs\startup" -ForegroundColor Yellow
+    Write-Host "`n`t" (get-childitem -force 'c:\programdata\microsoft\windows\start menu\programs\startup' | ?{$_.name -ne 'desktop.ini'}).name -ForegroundColor Yellow
+    Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+    Write-Host "`t`t- Could be used so that malware can persist." -ForegroundColor Gray
+    Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+    Write-Host "`n`n`n"
+}
+
+sleep(1)
+
+if ((gci $PSHome | ? {$_.name -like "*profile.ps1"}) ){
+    $misconfigCount++
+    Write-Host "$misconfigCount`. $PSHOME\Profile.ps1 has been changed." -ForegroundColor Yellow   
+    Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+    Write-Host "`t`t- This file can be used to execute malware when Powershell.exe is executed." -ForegroundColor Gray
+    Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+    Write-Host "`n`t`t`t`t`t Check $PSHOME\Profile.ps1." -ForegroundColor Gray
+    Write-Host "`n`n`n"
+}
+
+sleep(1)
+
+if ( (($env:path | out-string).split(";")).count -gt 6){
+    $misconfigCount++
+    Write-Host "$misconfigCount`. The Path environmental variable has been changed." -ForegroundColor Yellow
+    Write-Host "`n`tDefault Path for Windows: C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Users\icebo\AppData\Local\Microsoft\WindowsApps`n" -ForegroundColor Yellow
+    Write-Host "`tPath for this system: $env:path" -ForegroundColor Yellow
+    Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+    Write-Host "`t`t- Attackers can take advantage of local defenders by redirecting commands to perform a malicious action" -ForegroundColor Gray
+    Write-Host "`t`tbefore a legitimate command." -ForegroundColor Gray
+    Write-Host "`n`t`t`tExample: `n`t`t`t1. User opens CMD.EXE and types `"tasklist`"" -ForegroundColor Gray
+    Write-Host "`t`t`t2. `"Tasklist`" actually calls a script that runs a malicious command first, then runs" -ForegroundColor Gray
+    Write-Host "`t`t`tthe real tasklist so that everything seems normal`n" -ForegroundColor Gray
+    Write-Host "`t`t`t`t Course of Action:" -ForegroundColor Gray
+    Write-Host "`t`t`t`t`t - Investigate any additional folders in the path.`n`n`n" -ForegroundColor Gray
+
+}
+
+sleep(1)
+
+if (((get-item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' | out-string) -split "`n" | select-string Userinit | out-string).replace("Userinit                     :","").trim() -ne "C:\Windows\system32\userinit.exe,"){
+    $misconfigCount++
+    Write-Host "$misconfigCount`. Potential Threat found in the UserInit Registry value." -ForegroundColor Yellow
+    Write-Host "`n`tDefault USERINIT value for Windows: C:\Windows\system32\userinit.exe" -ForegroundColor Yellow
+    Write-Host "`tActual USERINIT value:"((get-item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' | out-string) -split "`n" | select-string Userinit | out-string).replace("Userinit                     :","").trim() -ForegroundColor Yellow
+    Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+    Write-Host "`t`t- Artifacts in this value automatically run. Could be used to persist." -ForegroundColor Gray
+    Write-Host "`n`t`t`t Course of Action:" -ForegroundColor Gray
+    Write-Host "`t`t`t`t - Make sure only userinit.exe is in this value.`n`n`n" -ForegroundColor Gray
+}
+
+Write-Host "`n"
+
+sleep(2)
 
 function getScheduledTasksThatStandOut() {
 
@@ -173,7 +263,10 @@ Work Folders Maintenance Work#\Microsoft\Windows\Work Folders\#Ready
 Automatic-Device-Join#\Microsoft\Windows\Workplace Join\#Disabled
 Recovery-Check#\Microsoft\Windows\Workplace Join\#Disabled
 NotificationTask#\Microsoft\Windows\WwanSvc\#Ready
-XblGameSaveTask#\Microsoft\XblGameSave\#Ready"
+XblGameSaveTask#\Microsoft\XblGameSave\#Ready
+AD RMS Rights Policy Template Management (Automated)#\Microsoft\Windows\Active Directory Rights Management Services Client\#Disabled
+AD RMS Rights Policy Template Management (Manual)#\Microsoft\Windows\Active Directory Rights Management Services Client\#Ready
+File History (maintenance mode)#\Microsoft\Windows\FileHistory\#Ready"
 
 Write-Host "Checking scheduled tasks...`n" -ForegroundColor Green
 
@@ -192,26 +285,41 @@ foreach($task in get-scheduledtask){
                 
 
                 if ($line.split("#")[1]){
-                    if ($path -ne $line.split("#")[1] -and $line -notlike "OneDrive*" -and $line -notlike "User_Feed*"){
+                    if ($path -ne $line.split("#")[1] -and $line -notlike "OneDrive*" -and $line -notlike "User_Feed*" -and $line -notlike "WifiTask*" -and $line -notlike "CreateObjectTask*"){
                         Write-Host "Scheduled Task: $name" -ForegroundColor Red
                         Write-Host "Correct path: $correctpath `nActual path: $path" -ForegroundColor Red
                         Write-Host Wrong path for $name -ForegroundColor Red
                         Write-Host "`n"
+                        $misconfigCount++
                     }
                 }
                 break
-            }       
+            }
+                   
         }
     }
 
-    elseif ($line -like "OneDrive*" -and $line -like "User_Feed*"){
-        continue;
-    }
-    else {
-        Write-Host "Additional Task: $name" -Foregroundcolor Yellow
-        Write-Host "Path: $path" -Foregroundcolor Yellow
-        Write-Host "`n"
 
+    else {
+        if ($name -like "*OneDrive*" -or $name -like "*User_Feed*" -or $name -like "*AD RMS*" -or $name -eq "File History (maintenance mode)" -or $name -eq "OSCleanup"){
+            continue;
+        }
+        else {
+            $misconfigCount++
+            Write-Host "$misconfigCount`. Additional Task Found in Scheduled Tasks." -Foregroundcolor Yellow
+            Write-Host "`tName of Scheduled Task: $name" -Foregroundcolor Yellow
+            Write-Host "`tPath of Scheduled Task: $path" -Foregroundcolor Yellow
+            Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+            Write-Host "`t`t- Scheduled Tasks are a common way of executing malicious activity covertly such as during after-work hours." -ForegroundColor Gray
+            Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+            Write-Host "`n`t`t`t`t`t Remove task(s) immediately if no one can take responsibility for this task." -ForegroundColor Gray
+            Write-Host "`n`n`n"
+                            
+            
+            
+            Write-Host "`n"
+            
+        }
     }    
 
 }
@@ -293,6 +401,8 @@ $lisaProcesses = $lisaProcesses.Trim()
 
     Write-Host "Checking processes...`n" -ForegroundColor Green
     sleep(5)
+    [bool]$noUnknownProcesses = $true
+
     foreach($proc in get-process){
         $name = $proc.Name
         $path = $proc.Path
@@ -307,75 +417,87 @@ $lisaProcesses = $lisaProcesses.Trim()
             if ($line -like "$name`#*"){
 
                 $correctlocation = $line.split("#")[1]
-                Write-Host "Process: $name" -ForegroundColor Green
+                
                 if ($line.split("#")[1]){
-                    Write-Host "Correct Location: $correctlocation `nActual Location: $path"
+                    
                     if ($path -ne $line.split("#")[1]){
-                        Write-Host $name in wrong location! -ForegroundColor Red
+                        $misconfigCount++
+                        Write-Host "$misconfigCount`. Process running from wrong location!"
+                        Write-Host "Process: $name" -ForegroundColor Yellow
+                        Write-Host "Correct Location: $correctlocation `nActual Location: $path" -ForegroundColor Yellow
+                        Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+                        Write-Host "`n`tTrojans typically mimic legitimate processes by name but run from incorrect locations." -ForegrounColor Gray
+                        Write-Host "`t`t- Malicious running processes are used as means of persistence and should be killed/removed." -ForegroundColor Gray
+                        Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+                        Write-Host "`n`t`t`t`t`t Ensure that this process does not belong to legitimate applications or the Windows environment." -ForegroundColor Gray
+                        Write-Host "`n`t`t`t`t`t Remove process immediately if this process is not being used legitimately." -ForegroundColor Gray
+                        Write-Host "`n`n`n"
+                        $noUnknownProcesses = $false
+
+
                     }
                 }
                 else {
-                    Write-Host "No path information given"
+                    
                 }
-
+                <#
                 if ($parentprocess){
                     Write-Host "Parent Process: $parentprocess`n`n`n`n`n"
                 }
                 else {
                     Write-Host "No Parent Process`n`n`n`n`n"
-                }
+                } #>
                 break
                 }
        
             }
         }
-        else {
-            $company = $proc.company
-            $starttime = $proc.starttime
-            Write-Host "Additional Process Running: $name" -ForegroundColor Yellow
-            Write-Host "Start time: $starttime"
-            if ($company){
-                Write-Host "Company: $company"
-            }
-            else {
-                Write-Host "No company information given"
 
+
+        else {
+            if ($name -ne "browser_broker" -and $name -ne "conhost" -and $name -ne "dasHost" -and $name -ne "HxAccounts" -and $name -ne "HxOutlook" -and $name -ne "HxTsr" -and
+                $name -ne "MicrosoftEdge" -and $name -ne "MicrosoftEdgeCP" -and $name -ne "mshta" -and $name -ne "OfficeHubTaskHost" -and $name -ne "sedsvc" -and $name -ne "SkypeApp" -and
+                $name -ne "SkypeBackgroundHost" -and $name -ne "SystemSettings" -and $name -ne "Windows.WARP.JITService" -and $name -ne "wsmprovhost" -and $name -ne "microsoft.photos" -and $name -ne "cmd"){
+                $company = $proc.company
+                $starttime = $proc.starttime
+                $noUnknownProcesses = $false
+                Write-Host "Additional Process Running: $name" -ForegroundColor Yellow
+                Write-Host "Start time: $starttime"
+                if ($company){
+                    Write-Host "Company: $company"
+                }
+                else {
+                    Write-Host "No company information given"
+                }
+
+                Write-Host "`n`tWhy is this a potential threat?`n" -ForegroundColor Gray
+                Write-Host "`t`t- Malicious running processes are used as means of persistence and should be killed/removed." -ForegroundColor Gray
+                Write-Host "`n`t`t`t`t Course of Action:" -ForegroundColor Gray
+                Write-Host "`n`t`t`t`t`t Ensure that this process does not belong to legitimate applications or the Windows environment." -ForegroundColor Gray
+                Write-Host "`n`t`t`t`t`t Remove process immediately if this process is not being used legitimately." -ForegroundColor Gray
+                Write-Host "`n`n`n"
             }
-            Write-Host "`n"
+
+ 
+            
         }
         
     }
+if ($noUnknownProcesses){
+    Write-Host "***NO UNKNOWN PROCESSES***" -ForegroundColor Green
+}
     
 }
 
-Write-Host "Checking for persistence items...`n" -Foregroundcolor Green
-
-sleep(5)
-
-if ((get-childitem -force 'HKLM:\software\microsoft\' | ? {$_.property -eq "Autorun"}))  {
-    Write-Host "HKLM:\Software\Microsoft contain Autoruns" -ForegroundColor Red
-}
-
-sleep(2)
-
-if ((Get-Item 'HKLM:\software\microsoft\windows\CurrentVersion\run').ValueCount -gt 1){
-    Write-Host "Additional Keys in Windows\CurrentVersion\Run" -ForegroundColor Red
-}
-
-sleep(2)
-if ((get-childitem -force 'c:\programdata\microsoft\windows\start menu\programs\startup').count -gt 1){
-    Write-Host "Additional Items in C:\ProgramData\Microsoft\Windows\Start Menu\programs\startup" -ForegroundColor Red
-}
-
-sleep(2)
-
-if ((gci $PSHome | ? {$_.name -like "*profile.ps1"}) ){
-    Write-Host "$PSHOME\Profile.ps1 has been changed. This file can be used to execute malware when Powershell.exe is executed. Please check profile.ps1" -ForegroundColor Yellow   
-}
-
-Write-Host "`n"
-sleep(1)
-
 
 getScheduledTasksThatStandOut
+
 getProcessesThatStandOut
+$misconfigCount++
+Write-Host "`n`n`nTOTAL NUMBER OF MISCONFIGURATIONS FOUND:`t$misconfigCount" -ForegroundColor Cyan
+
+<#
+
+    get-item hkcu:\software\microsoft\internet explorer\typedurls
+
+#>

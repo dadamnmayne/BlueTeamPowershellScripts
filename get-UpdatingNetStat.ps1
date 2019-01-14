@@ -15,8 +15,6 @@ while ($true){
         sleep(1)
     }
     else {
-
         $compare = $current
-    
     }
 }

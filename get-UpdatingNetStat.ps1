@@ -1,4 +1,13 @@
-﻿
+<#
+        .Notes  
+            File Name      : get-UpdatingNetStat.ps1
+            Version        : v.1.0
+            Author         : @TerrySmithMBA
+            Prerequisite   : Windows PowerShell 5.0
+            Created        : January 16, 2019
+            Info           : Creates a live netstat to monitor new established connections.
+#>
+
 Write-Host "Monitoring Connections"
 
 while ($true){
